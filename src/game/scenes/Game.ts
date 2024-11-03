@@ -16,7 +16,9 @@ export class Game extends Scene
 
     preload()
     {
-        this.load.image('ground', 'assets/platform.png');
+        this.load.spritesheet('floor', 'assets/sprites/location/indoors/Top-Down_Retro_Interior/TopDownHouse_FloorsAndWalls.png', 
+            {frameWidth: 64, frameHeight:64 }
+        );
         this.load.spritesheet('unarmed_walking', 
             'assets/sprites/character/male/PNG/Unarmed_Walk/Unarmed_Walk_full.png',
             { frameWidth: 64, frameHeight: 64 }
@@ -33,7 +35,7 @@ export class Game extends Scene
         this.camera = this.cameras.main;
         this.camera.setBackgroundColor(0x00ff00);
 
-        this.background = this.add.image(512, 384, 'background');
+        this.background = this.add.sprite(512, 384, 'floor', 5).setScale(3);
         this.platforms = this.physics.add.staticGroup();
 
         this.platforms.create(400, 568, 'ground').setScale(2).refreshBody();
@@ -45,6 +47,12 @@ export class Game extends Scene
         this.physics.add.collider(this.player, this.platforms);
 
 
+        this.anims.create({
+            key: 'down',
+            frames: this.anims.generateFrameNumbers('unarmed_walking', { start: 0, end: 5 }),
+            frameRate: 10,
+            repeat: -1
+        });
 
         this.anims.create({
             key: 'left',
@@ -69,6 +77,13 @@ export class Game extends Scene
             repeat: -1
         });
 
+        this.anims.create({
+            key: 'up',
+            frames: this.anims.generateFrameNumbers('unarmed_walking', { start: 17, end: 23 }),
+            frameRate: 10,
+            repeat: -1
+        });
+
     
         this.player.anims.play('idle', true);
         EventBus.emit('current-scene-ready', this);
@@ -76,8 +91,6 @@ export class Game extends Scene
 
     update(time: any, delta:any)
     {
-
-
         const cursors = this.input.keyboard!.createCursorKeys();
 
         if (cursors.left.isDown)
@@ -92,18 +105,22 @@ export class Game extends Scene
         
             this.player.anims.play('right', true);
         }
+        else if (cursors.up.isDown)
+        {
+            this.player.setVelocityY(-160);
+            this.player.anims.play('up', true);
+        }   
+        else if (cursors.down.isDown)
+        {
+            this.player.setVelocityY(160);
+            this.player.anims.play('down', true);
+        }
         else
         {
             this.player.setVelocityX(0);
-        
+            this.player.setVelocityY(0);
             this.player.anims.play('turn');
         }
-        
-        if (cursors.space.isDown && this.player.body.touching.down)
-        {
-            this.player.setVelocityY(-330);
-        }
-            
     }
 
     changeScene ()
