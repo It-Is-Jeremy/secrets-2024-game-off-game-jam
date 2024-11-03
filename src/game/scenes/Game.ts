@@ -79,7 +79,7 @@ export class Game extends Scene
 
         this.anims.create({
             key: 'up',
-            frames: this.anims.generateFrameNumbers('unarmed_walking', { start: 17, end: 23 }),
+            frames: this.anims.generateFrameNumbers('unarmed_walking', { start: 18, end: 23 }),
             frameRate: 10,
             repeat: -1
         });
@@ -89,37 +89,43 @@ export class Game extends Scene
         EventBus.emit('current-scene-ready', this);
     }
 
+    playerDirection: PlayerDirection;
     update(time: any, delta:any)
     {
         const cursors = this.input.keyboard!.createCursorKeys();
 
-        if (cursors.left.isDown)
+        if (cursors.left.isDown && (this.playerDirection === PlayerDirection.Idle || this.playerDirection === PlayerDirection.Left))
         {
             this.player.setVelocityX(-160);
         
             this.player.anims.play('left', true);
+            this.playerDirection = PlayerDirection.Left;
         }
-        else if (cursors.right.isDown)
+        else if (cursors.right.isDown && (this.playerDirection === PlayerDirection.Idle || this.playerDirection === PlayerDirection.Right))
         {
             this.player.setVelocityX(160);
         
             this.player.anims.play('right', true);
+            this.playerDirection = PlayerDirection.Right;
         }
-        else if (cursors.up.isDown)
+        else if (cursors.up.isDown && (this.playerDirection === PlayerDirection.Idle || this.playerDirection === PlayerDirection.Up))
         {
             this.player.setVelocityY(-160);
             this.player.anims.play('up', true);
+            this.playerDirection = PlayerDirection.Up;
         }   
-        else if (cursors.down.isDown)
+        else if (cursors.down.isDown && (this.playerDirection === PlayerDirection.Idle || this.playerDirection === PlayerDirection.Down))
         {
             this.player.setVelocityY(160);
             this.player.anims.play('down', true);
+            this.playerDirection = PlayerDirection.Down;
         }
         else
         {
             this.player.setVelocityX(0);
             this.player.setVelocityY(0);
             this.player.anims.play('turn');
+            this.playerDirection = PlayerDirection.Idle;
         }
     }
 
@@ -128,3 +134,12 @@ export class Game extends Scene
         this.scene.start('GameOver');
     }
 }
+
+
+enum PlayerDirection {
+    Up,
+    Down,
+    Left,
+    Right,
+    Idle
+};
